@@ -1,0 +1,87 @@
+{
+  "Parameters": {
+    "paramUserGroupName": {
+      "Description": "Unique name for a new user",
+      "Type": "String",
+      "AllowedPattern": "^[a-zA-Z][a-zA-Z0-9]{1,64}$",
+      "ConstraintDescription": "User name must be between 1 and 64 alphanumeric characters in length, starting with an uppercase or lowercase character of the alphabet."
+    },
+    "paramPath": {
+      "Description": "IAM Path that you want to associate with the user",
+      "Type": "String",
+      "AllowedPattern": "(^\\/$)|(^\\/.*\\/$)",
+      "Default": "/"
+    },
+    "paramTagValue": {
+      "Description": "Tag value that identifies resources as a target for deployments",
+      "Type": "String",
+      "Default": "UserProvisioned",
+      "AllowedPattern": "[\\x20-\\x7E]*",
+      "ConstraintDescription": "Must contain only ASCII characters"
+    }
+  },
+  "Resources": {
+    "rnpmfagroup": {
+      "Type": "AWS::IAM::Group",
+      "Properties": {
+        "GroupName": {
+          "Fn::Join": [
+            "-",
+            [
+              {"Ref": "AWS::Region"},
+              {"Ref": "paramUserGroupName"}
+            ]
+          ]
+        },
+        "Path": {
+          "Ref": "paramPath"
+        },
+        "Policies": [
+          {
+            "PolicyName": "LearnMFAUsers",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "iam:DeactivateMFADevice",
+                    "iam:DeleteVirtualMFADevice",
+                    "iam:EnableMFADevice",
+                    "iam:ResyncMFADevice",
+                    "iam:UntagMFADevice",
+                    "iam:TagMFADevice",
+                    "iam:CreateVirtualMFADevice",
+                    "iam:ListMFADevices",
+                    "iam:ListMFADeviceTags",
+                    "iam:ListGroupsForUser",
+                    "iam:ListUsers",
+                    "iam:ListUserTags"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "outputName": {
+      "Description": "Group name",
+      "Value": {
+        "Ref": "rnpmfagroup"
+      }
+    },
+    "outputARN": {
+      "Description": "Group ARN",
+      "Value": {
+        "Fn::GetAtt": [
+          "rnpmfagroup",
+          "Arn"
+        ]
+      }
+    }
+  }
+}

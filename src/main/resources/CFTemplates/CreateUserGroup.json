@@ -1,0 +1,63 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "AWS CloudFormation sample template.  Create an IAM Group. Optionally embed AWS managed policies, customer managed policies and inline policies in the group. AWS doc: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-group.html",
+    "Parameters": {
+        "paramPath": {
+            "Description": "IAM Path that you want to associate with the group",
+            "Type": "String",
+            "AllowedPattern": "(^\\/$)|(^\\/.*\\/$)",
+            "Default": "/"
+        }
+    },
+    "Resources": {
+        "myGroup": {
+            "Type": "AWS::IAM::Group",
+            "Properties": {
+                "GroupName": "ApiDevelopers",
+                "Path": {
+                    "Ref": "paramPath"
+                },
+                "ManagedPolicyArns": [
+                    "arn:aws:iam::aws:policy/AWSCloud9Administrator",
+                    "arn:aws:iam::aws:policy/AmazonAPIGatewayAdministrator"
+                ],
+                "Policies": [
+                    {
+                        "PolicyName": "inlineCloudWatchLogsPolicy",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "logs:CreateLogGroup",
+                                        "logs:CreateLogStream*",
+                                        "logs:PutLogEvents"
+                                    ],
+                                    "Resource": "*"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "Outputs": {
+        "outputName": {
+            "Description": "Group name",
+            "Value": {
+                "Ref": "myGroup"
+            }
+        },
+        "outputARN": {
+            "Description": "Group ARN",
+            "Value": {
+                "Fn::GetAtt": [
+                    "myGroup",
+                    "Arn"
+                ]
+            }
+        }
+    }
+}

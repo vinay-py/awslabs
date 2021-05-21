@@ -20,14 +20,14 @@ public class LabEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     Long id;
 
-    String labName;
+    String name;
     String labDescription;
     String stackLocation;
-//    String stackName;
-//    String userGroupName;
+    String stackName;
+    String userGroupName;
 
     public LabEntity(String labName, String labDescription, String stackLocation) {
-        this.labName = labName;
+        this.name = labName;
         this.labDescription = labDescription;
         this.stackLocation = stackLocation;
     }

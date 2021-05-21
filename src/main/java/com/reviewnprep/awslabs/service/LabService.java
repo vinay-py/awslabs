@@ -1,5 +1,6 @@
 package com.reviewnprep.awslabs.service;
 
+import com.reviewnprep.awslabs.awsall.CreateStack;
 import com.reviewnprep.awslabs.dto.LabDto;
 import com.reviewnprep.awslabs.entity.LabEntity;
 import com.reviewnprep.awslabs.repository.LabRepository;
@@ -11,6 +12,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class LabService {
+
     @Autowired
     LabRepository labRepository;
 
@@ -23,10 +25,19 @@ public class LabService {
 
         labRepository.save(labEntity);
 
-        responseLabDto = new LabDto(labEntity.getLabName(),
-            labEntity.getLabDescription(),
-            labEntity.getStackLocation());
+        labEntity.setStackName(labEntity.getName() + "-" + labEntity.getId());
 
+        labEntity.setUserGroupName(CreateStack.createUserGroup(labEntity));
+
+        labRepository.save(labEntity);
+
+        responseLabDto = new LabDto(
+            labEntity.getId(),
+            labEntity.getName(),
+            labEntity.getLabDescription(),
+            labEntity.getStackLocation(),
+            labEntity.getStackName(),
+            labEntity.getUserGroupName());
         return responseLabDto;
     }
 
@@ -34,9 +45,14 @@ public class LabService {
         return labRepository.findAll()
             .stream()
             .map(
-                labEntity -> new LabDto(labEntity.getLabName(),
+                labEntity -> new LabDto(
+                    labEntity.getId(),
+                    labEntity.getName(),
                     labEntity.getLabDescription(),
-                    labEntity.getStackLocation())
+                    labEntity.getStackLocation(),
+                    labEntity.getStackName(),
+                    labEntity.getUserGroupName())
             ).collect(Collectors.toList());
     }
+
 }
